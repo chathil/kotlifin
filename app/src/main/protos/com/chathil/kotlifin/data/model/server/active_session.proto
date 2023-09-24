@@ -1,0 +1,13 @@
+syntax = "proto3";
+
+package com.chathil.kotlifin.data.model.session;
+
+message ActiveSessionProto {
+  string user_id = 1;
+  string username = 2;
+  string server_id = 3;
+  string server_public_address = 4;
+  string server_local_address = 5;
+  string server_name = 6;
+  string access_token = 7;
+}
