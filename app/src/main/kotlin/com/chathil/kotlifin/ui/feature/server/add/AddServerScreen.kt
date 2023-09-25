@@ -21,6 +21,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -30,9 +31,11 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.chathil.kotlifin.ui.feature.server.ServerManagementViewModel
+import com.chathil.kotlifin.ui.feature.server.list.ServerListRoute
 import com.chathil.kotlifin.ui.feature.server.mvi.Event
 import com.chathil.kotlifin.ui.feature.server.mvi.Intent
 import com.chathil.kotlifin.ui.feature.server.mvi.State
+import com.chathil.kotlifin.ui.feature.server.signin.navigateToSignIn
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -90,25 +93,25 @@ private fun AddServerTopAppBar(
 
 const val AddServerRoute = "add_server"
 
-fun NavGraphBuilder.addServerScreen(
-    viewModel: ServerManagementViewModel,
-    goToSignIn: () -> Unit = {},
-    onBackPressed: () -> Unit = {}
-) {
-    composable(AddServerRoute) {
+fun NavGraphBuilder.addServerScreen(navController: NavController) {
+    composable(AddServerRoute) { backStackEntry ->
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry(ServerListRoute)
+        }
+        val viewModel: ServerManagementViewModel = hiltViewModel(parentEntry)
         val state by viewModel.viewStates.collectAsStateWithLifecycle()
 
         LaunchedEffect(Unit) {
             viewModel.viewEvents.collect { event ->
                 when(event) {
-                    is Event.NavigateToSignIn -> goToSignIn()
+                    is Event.NavigateToSignIn -> navController.navigateToSignIn()
                     is Event.NavigateToHome -> {}
                     is Event.NavigateToSelectUser -> {}
                 }
             }
         }
 
-        AddServerScreen(state = state, dispatch = viewModel::dispatch, onBackPressed = onBackPressed)
+        AddServerScreen(state = state, dispatch = viewModel::dispatch, onBackPressed = navController::navigateUp)
     }
 }
 

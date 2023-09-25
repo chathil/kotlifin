@@ -21,15 +21,19 @@ import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.chathil.kotlifin.data.model.server.JellyfinServer
+import com.chathil.kotlifin.ui.feature.home.navigateToHomeScreen
 import com.chathil.kotlifin.ui.feature.server.ServerManagementViewModel
+import com.chathil.kotlifin.ui.feature.server.list.ServerListRoute
 import com.chathil.kotlifin.ui.feature.server.mvi.Event
 import com.chathil.kotlifin.ui.feature.server.mvi.Intent
 import com.chathil.kotlifin.ui.feature.server.mvi.State
@@ -100,23 +104,23 @@ private fun SignInTopAppBar(onBackPressed: () -> Unit = {}) {
 
 const val SignInRoute = "signin"
 
-fun NavGraphBuilder.signInScreen(
-    viewModel: ServerManagementViewModel,
-    goToHome: () -> Unit = {},
-    onBackPressed: () -> Unit = {}
-) {
-    composable(SignInRoute) {
+fun NavGraphBuilder.signInScreen(navController: NavController) {
+    composable(SignInRoute) { backStackEntry ->
+        val parentEntry = remember(backStackEntry) {
+            navController.getBackStackEntry(ServerListRoute)
+        }
+        val viewModel: ServerManagementViewModel = hiltViewModel(parentEntry)
         val state by viewModel.viewStates.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) {
             viewModel.viewEvents.collect { event ->
-                if (event is Event.NavigateToHome) goToHome()
+                if (event is Event.NavigateToHome) navController.navigateToHomeScreen()
             }
         }
 
         ServerSignInScreen(
             state = state,
             dispatch = viewModel::dispatch,
-            onBackPressed = onBackPressed
+            onBackPressed = navController::navigateUp
         )
     }
 }

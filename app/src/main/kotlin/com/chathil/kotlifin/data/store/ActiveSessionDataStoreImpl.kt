@@ -12,7 +12,7 @@ class ActiveSessionDataStoreImpl(
     private val activeSessionSerializer: DataStore<ActiveSessionProto>
 ) : ActiveSessionDataStore {
 
-    override suspend fun changeSession(session: ActiveSession): Unit {
+    override suspend fun changeSession(session: ActiveSession) {
         activeSessionSerializer.updateData {
                 ActiveSessionProto(
                     user_id = session.userId,

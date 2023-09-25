@@ -23,10 +23,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.chathil.kotlifin.data.model.server.JellyfinServer
@@ -143,11 +146,11 @@ fun ServerListScreenPreview() {
 const val ServerListRoute = "server_list"
 
 fun NavGraphBuilder.serverListScreen(
-    viewModel: ServerManagementViewModel,
     onAddServer: () -> Unit = {},
     onSelectUser: (serverId: String) -> Unit = {}
 ) {
-    composable(ServerListRoute) {
+    composable(ServerListRoute) { _ ->
+        val viewModel: ServerManagementViewModel = hiltViewModel()
         val state by viewModel.viewStates.collectAsStateWithLifecycle()
         LaunchedEffect(Unit) {
             viewModel.viewEvents.collect { event ->

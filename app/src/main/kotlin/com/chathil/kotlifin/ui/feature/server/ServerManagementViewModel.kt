@@ -55,7 +55,7 @@ class ServerManagementViewModel @Inject constructor(
     override fun reducer(state: State, result: Result): State = when(result) {
         is Result.ConnectResult -> when(result.data) {
             is Resource.Loading -> state.copy(isLoading = true, error = null)
-            is Resource.Success -> state.copy(isLoading = false, newServer = result.data.data.also { Timber.tag("ServerManagementViewModel").d(it.toString()) }).also {
+            is Resource.Success -> state.copy(isLoading = false, newServer = result.data.data).also {
                 sendViewEvent(Event.NavigateToSignIn)
             }
             is Resource.Error -> state.copy(isLoading = false, error = result.data.error)
