@@ -158,6 +158,7 @@ fun NavGraphBuilder.serverListScreen(
                     is Event.NavigateToSelectUser -> onSelectUser(event.server.id)
                     is Event.NavigateToSignIn -> {}
                     is Event.NavigateToHome -> {}
+                    else -> {}
                 }
             }
         }

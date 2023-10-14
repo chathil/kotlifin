@@ -61,7 +61,7 @@ class ServerManagementViewModel @Inject constructor(
             is Resource.Error -> state.copy(isLoading = false, error = result.data.error)
         }
 
-        is Result.SelectedServer -> state.also {
+        is Result.SelectedServer -> state.copy(newServer = result.server).also {
             sendViewEvent(Event.NavigateToSelectUser(result.server))
         }
         is Result.SelectedUser -> state.copy(selectedUser = result.user)

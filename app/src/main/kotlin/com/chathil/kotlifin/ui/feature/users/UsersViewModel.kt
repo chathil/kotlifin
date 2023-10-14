@@ -57,12 +57,16 @@ class UsersViewModel @Inject constructor(
             )
             result
         }
+
+        is Action.RemoveUser -> userRepository.removeUser(action.user.id)
+            .map(Result::RemoveUserResult)
     }
 
     override fun intentToAction(intent: Intent): Action = when (intent) {
         is Intent.LoadUsers -> Action.LoadUsers(intent.serverId)
         is Intent.LoadServerDetail -> Action.LoadServerDetail(intent.serverId)
         is Intent.SwitchSession -> Action.SwitchSession(intent.user, intent.server)
+        is Intent.RemoveUser -> Action.RemoveUser(intent.user)
     }
 
     override fun reducer(state: State, result: Result): State = when (result) {
@@ -80,6 +84,13 @@ class UsersViewModel @Inject constructor(
 
         is Result.SwitchSession -> state.also {
             sendViewEvent(Event.NavigateToHome)
+        }
+        is Result.RemoveUserResult -> when (result.data) {
+            is Resource.Loading -> state.copy(isLoading = true)
+            is Resource.Success -> state.copy(isLoading = false).also {
+                dispatch(Intent.LoadUsers(state.server.id))
+            }
+            is Resource.Error -> state.copy(error = result.data.error)
         }
     }
 }

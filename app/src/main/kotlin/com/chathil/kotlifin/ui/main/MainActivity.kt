@@ -50,8 +50,6 @@ class MainActivity : ComponentActivity() {
                 NavHost(navController = navController, startDestination = startDestination) {
 
                     navigation(startDestination = ServerListRoute, route = "management") {
-                        val viewModel: ServerManagementViewModel by viewModels()
-
                         serverListScreen(
                             onAddServer = { navController.navigateToAddServerScreen() },
                             onSelectUser = { serverId -> navController.navigateToUsersScreen(serverId) }
@@ -63,6 +61,9 @@ class MainActivity : ComponentActivity() {
                             onBackPressed = { navController.navigateUp() },
                             goToHome = {
                                 navController.navigateToHomeScreen()
+                            },
+                            goToSignIn = {
+                                navController.navigateToSignIn()
                             }
                         )
                         signInScreen(

@@ -1,20 +1,28 @@
 package com.chathil.kotlifin.ui.feature.users
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Image
+import androidx.compose.material.icons.rounded.PersonAdd
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -22,11 +30,13 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,12 +61,14 @@ import kotlinx.coroutines.flow.map
 fun UsersScreen(
     state: State = State.Initial,
     dispatch: (Intent) -> Unit = {},
+    onAddUser: () -> Unit = {},
     onBackPressed: () -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             UsersTopAppBar(
                 serverName = state.server.name,
+                onAddUser = onAddUser,
                 onBackPressed = onBackPressed
             )
         }
@@ -70,7 +82,8 @@ fun UsersScreen(
             state.users.forEach { user ->
                 ItemUser(
                     user = user,
-                    onTapped = { dispatch(Intent.SwitchSession(user, state.server)) }
+                    onTapped = { dispatch(Intent.SwitchSession(user, state.server)) },
+                    onRemoveTapped = { dispatch(Intent.RemoveUser(user)) }
                 )
                 Divider()
             }
@@ -82,6 +95,7 @@ fun UsersScreen(
 @Composable
 private fun UsersTopAppBar(
     serverName: String,
+    onAddUser: () -> Unit = {},
     onBackPressed: () -> Unit = {}
 ) {
     LargeTopAppBar(
@@ -89,6 +103,11 @@ private fun UsersTopAppBar(
         navigationIcon = {
             IconButton(onClick = onBackPressed) {
                 Icon(imageVector = Icons.Rounded.ArrowBack, contentDescription = "")
+            }
+        },
+        actions = {
+            IconButton(onClick = onAddUser) {
+                Icon(imageVector = Icons.Rounded.PersonAdd, contentDescription = "add user")
             }
         }
     )
@@ -98,11 +117,14 @@ private fun UsersTopAppBar(
 private fun ItemUser(
     modifier: Modifier = Modifier,
     user: JellyfinUser,
-    onTapped: () -> Unit = {}
+    onTapped: () -> Unit = {},
+    onRemoveTapped: () -> Unit
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight()
             .clickable { onTapped() } // TODO: add ripple fx
             .padding(
                 horizontal = KotlifinTheme.dimensions.spacingMedium,
@@ -115,14 +137,21 @@ private fun ItemUser(
             modifier = Modifier.size(32.dp)
         )
         Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingXS))
-        Text(user.name, modifier = Modifier.fillMaxWidth())
+        Text(user.name, modifier = Modifier.weight(1f))
+        IconButton(onClick = onRemoveTapped, modifier = Modifier.wrapContentSize()) {
+            Icon(imageVector = Icons.Rounded.Delete, contentDescription = "remove user")
+        }
     }
 }
 
 const val UsersRoute = "users"
 const val UsersRouteServerId = "serverId/"
 
-fun NavGraphBuilder.usersScreen(onBackPressed: () -> Unit = {}, goToHome: () -> Unit = {}) {
+fun NavGraphBuilder.usersScreen(
+    onBackPressed: () -> Unit = {},
+    goToHome: () -> Unit = {},
+    goToSignIn: () -> Unit = {}
+) {
     composable(
         route = "$UsersRoute{${UsersRouteServerId}}",
         arguments = listOf(
@@ -143,7 +172,7 @@ fun NavGraphBuilder.usersScreen(onBackPressed: () -> Unit = {}, goToHome: () -> 
             }
         }
 
-        UsersScreen(state, viewModel::dispatch, onBackPressed)
+        UsersScreen(state, viewModel::dispatch, onAddUser = goToSignIn, onBackPressed)
     }
 }
 

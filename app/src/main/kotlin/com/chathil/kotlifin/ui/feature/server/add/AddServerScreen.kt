@@ -107,6 +107,7 @@ fun NavGraphBuilder.addServerScreen(navController: NavController) {
                     is Event.NavigateToSignIn -> navController.navigateToSignIn()
                     is Event.NavigateToHome -> {}
                     is Event.NavigateToSelectUser -> {}
+                    else -> {}
                 }
             }
         }
