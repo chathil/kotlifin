@@ -7,5 +7,5 @@ sealed interface Action {
     data class LoadUsers(val serverId: String) : Action
     data class LoadServerDetail(val serverId: String) : Action
     data class SwitchSession(val user: JellyfinUser, val server: JellyfinServer) : Action
-    data class RemoveUser(val user: JellyfinUser) : Action
+    data class RemoveUser(val user: JellyfinUser, val server: JellyfinServer) : Action
 }

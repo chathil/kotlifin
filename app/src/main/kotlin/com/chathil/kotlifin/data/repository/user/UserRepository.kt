@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 
 interface UserRepository {
     fun signIn(username: String, pwd: String, server: JellyfinServer): Flow<Resource<JellyfinUser>>
-    fun removeUser(id: String): Flow<Resource<Unit>>
+    fun removeUser(userId: String, serverId: String): Flow<Resource<Unit>>
     fun loadUsers(serverId: String): Flow<Resource<List<JellyfinUser>>>
 }

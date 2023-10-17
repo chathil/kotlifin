@@ -7,5 +7,5 @@ sealed interface Intent {
     data class LoadUsers(val serverId: String) : Intent
     data class LoadServerDetail(val serverId: String) : Intent
     data class SwitchSession(val user: JellyfinUser, val server: JellyfinServer) : Intent
-    data class RemoveUser(val user: JellyfinUser) : Intent
+    data class RemoveUser(val user: JellyfinUser, val server: JellyfinServer) : Intent
 }

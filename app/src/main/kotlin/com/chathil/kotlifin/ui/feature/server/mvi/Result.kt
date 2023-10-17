@@ -14,4 +14,5 @@ sealed interface Result {
     data class UpdateUsername(val username: String): Result
     data class UpdatePwd(val pwd: String): Result
     data class SignInResult(val data: Resource<JellyfinUser>): Result
+    data class RemoveServer(val data: Resource<Unit>) : Result
 }

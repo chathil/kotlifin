@@ -58,7 +58,7 @@ class UsersViewModel @Inject constructor(
             result
         }
 
-        is Action.RemoveUser -> userRepository.removeUser(action.user.id)
+        is Action.RemoveUser -> userRepository.removeUser(action.user.id, action.server.id)
             .map(Result::RemoveUserResult)
     }
 
@@ -66,7 +66,7 @@ class UsersViewModel @Inject constructor(
         is Intent.LoadUsers -> Action.LoadUsers(intent.serverId)
         is Intent.LoadServerDetail -> Action.LoadServerDetail(intent.serverId)
         is Intent.SwitchSession -> Action.SwitchSession(intent.user, intent.server)
-        is Intent.RemoveUser -> Action.RemoveUser(intent.user)
+        is Intent.RemoveUser -> Action.RemoveUser(intent.user, intent.server)
     }
 
     override fun reducer(state: State, result: Result): State = when (result) {

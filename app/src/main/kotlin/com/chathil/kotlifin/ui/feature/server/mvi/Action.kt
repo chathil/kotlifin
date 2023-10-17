@@ -13,4 +13,5 @@ sealed interface Action {
     data class UpdateUsername(val username: String): Action
     data class UpdatePwd(val pwd: String): Action
     data class SignIn(val username: String, val pwd: String, val server: JellyfinServer): Action
+    data class RemoveServer(val serverId: String) : Action
 }

@@ -13,4 +13,5 @@ sealed interface Intent {
     data class UpdateUsername(val username: String): Intent
     data class UpdatePwd(val pwd: String): Intent
     data class SignIn(val username: String, val pwd: String, val server: JellyfinServer): Intent
+    data class RemoveServer(val serverId: String) : Intent
 }

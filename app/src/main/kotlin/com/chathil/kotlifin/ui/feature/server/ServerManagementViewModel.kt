@@ -38,7 +38,10 @@ class ServerManagementViewModel @Inject constructor(
         is Action.UpdatePwd -> flowOf(Result.UpdatePwd(action.pwd))
         is Action.UpdateUsername -> flowOf(Result.UpdateUsername(action.username))
         is Action.LoadServers -> serverRepository.loadServers().map(Result::LoadServersResult)
-        is Action.SignIn -> userRepository.signIn(action.username, action.pwd, action.server).map(Result::SignInResult)
+        is Action.SignIn -> userRepository.signIn(action.username, action.pwd, action.server)
+            .map(Result::SignInResult)
+        is Action.RemoveServer -> serverRepository.removeServer(action.serverId)
+            .map(Result::RemoveServer)
     }
 
     override fun intentToAction(intent: Intent): Action = when(intent) {
@@ -50,6 +53,7 @@ class ServerManagementViewModel @Inject constructor(
         is Intent.UpdateUsername -> Action.UpdateUsername(intent.username)
         is Intent.LoadServers -> Action.LoadServers
         is Intent.SignIn -> Action.SignIn(intent.username, intent.pwd, intent.server)
+        is Intent.RemoveServer -> Action.RemoveServer(intent.serverId)
     }
 
     override fun reducer(state: State, result: Result): State = when(result) {
@@ -78,6 +82,13 @@ class ServerManagementViewModel @Inject constructor(
             is Resource.Loading -> state.copy(isLoading = true, error = null)
             is Resource.Success -> state.copy(isLoading = false).also {
                 sendViewEvent(Event.NavigateToHome)
+            }
+            is Resource.Error -> state.copy(isLoading = false, error = result.data.error)
+        }
+        is Result.RemoveServer -> when(result.data) {
+            is Resource.Loading -> state.copy(isLoading = true, error = null)
+            is Resource.Success -> state.copy(isLoading = false).also {
+                dispatch(Intent.LoadServers)
             }
             is Resource.Error -> state.copy(isLoading = false, error = result.data.error)
         }

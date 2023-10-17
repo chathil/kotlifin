@@ -83,7 +83,7 @@ fun UsersScreen(
                 ItemUser(
                     user = user,
                     onTapped = { dispatch(Intent.SwitchSession(user, state.server)) },
-                    onRemoveTapped = { dispatch(Intent.RemoveUser(user)) }
+                    onRemoveTapped = { dispatch(Intent.RemoveUser(user, state.server)) }
                 )
                 Divider()
             }

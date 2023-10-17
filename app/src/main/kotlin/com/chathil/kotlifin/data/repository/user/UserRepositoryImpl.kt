@@ -14,6 +14,8 @@ import com.chathil.kotlifin.data.store.ActiveSessionDataStore
 import com.chathil.kotlifin.data.vo.Resource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
@@ -51,14 +53,18 @@ class UserRepositoryImpl @Inject constructor(
             .catch { error -> emit(Resource.Error(error)) }
     }
 
-    override fun removeUser(id: String): Flow<Resource<Unit>> {
+    override fun removeUser(userId: String, serverId: String): Flow<Resource<Unit>> {
         return flow<Resource<Unit>> {
-            localDataSource.userDao().deleteUserById(id)
+            localDataSource.userDao().deleteUserById(userId)
+        }.flatMapLatest {
+            localDataSource.userDao().loadUsersByServerId(serverId)
+        }.map<List<JellyfinUserEntity>, Resource<Unit>> { users ->
+            if(users.isEmpty()) {
+                localDataSource.serverDao().deleteServerById(serverId)
+            }
+            Resource.Success(Unit)
         }.onStart { emit(Resource.Loading()) }
             .catch { error -> emit(Resource.Error(error)) }
-            .map {
-                Resource.Success(Unit)
-            }
     }
 
     override fun loadUsers(serverId: String): Flow<Resource<List<JellyfinUser>>> {

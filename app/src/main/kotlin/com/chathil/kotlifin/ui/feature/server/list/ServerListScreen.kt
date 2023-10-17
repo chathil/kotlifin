@@ -1,6 +1,5 @@
 package com.chathil.kotlifin.ui.feature.server.list
 
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -8,8 +7,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.List
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Card
@@ -23,13 +24,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.chathil.kotlifin.data.model.server.JellyfinServer
@@ -49,11 +48,11 @@ fun ServerListScreen(
     Scaffold(topBar = { ServerListTopAppBar(onAddTapped = onAddServer) }) { padding ->
         Column(
             modifier = Modifier
-                .horizontalScroll(rememberScrollState())
+                .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
             state.savedServers.forEach { server ->
-                ServerCard(server = server, onTapped = { server -> dispatch(Intent.SelectedServer(server)) })
+                ServerCard(server = server, dispatch = dispatch)
             }
         }
     }
@@ -64,20 +63,21 @@ fun ServerListScreen(
 private fun ServerCard(
     modifier: Modifier = Modifier,
     server: JellyfinServer,
-    onTapped: (server: JellyfinServer) -> Unit = {}
+    dispatch: (Intent) -> Unit = {}
 ) {
     Card(
         modifier = modifier
-            .fillMaxWidth()
             .padding(
                 horizontal = KotlifinTheme.dimensions.spacingMedium,
                 KotlifinTheme.dimensions.spacingSmall
             ),
-        onClick = { onTapped(server) }
+        onClick = { dispatch(Intent.SelectedServer(server)) }
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(KotlifinTheme.dimensions.spacingSmall)
+            horizontalArrangement = Arrangement.Start,
+            modifier = Modifier
+                .fillMaxWidth().padding(KotlifinTheme.dimensions.spacingSmall)
         ) {
             Icon(
                 modifier = Modifier
@@ -88,12 +88,16 @@ private fun ServerCard(
             )
 
             Column(
-                modifier = Modifier.padding(end = KotlifinTheme.dimensions.spacingSmall),
+                modifier = Modifier.weight(1f).padding(end = KotlifinTheme.dimensions.spacingSmall),
                 verticalArrangement = Arrangement.spacedBy(KotlifinTheme.dimensions.spacingXXS)
             ) {
                 Text(server.name, style = MaterialTheme.typography.titleMedium)
                 Text(server.publicAddress, style = MaterialTheme.typography.bodyMedium)
                 Text("${server.users.count()} user", style = MaterialTheme.typography.bodyMedium)
+            }
+
+            IconButton(onClick = { dispatch(Intent.RemoveServer(server.id)) }) {
+                Icon(Icons.Rounded.Delete, "remove server")
             }
         }
     }
@@ -158,7 +162,6 @@ fun NavGraphBuilder.serverListScreen(
                     is Event.NavigateToSelectUser -> onSelectUser(event.server.id)
                     is Event.NavigateToSignIn -> {}
                     is Event.NavigateToHome -> {}
-                    else -> {}
                 }
             }
         }
