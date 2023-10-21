@@ -1,5 +1,8 @@
 package com.chathil.kotlifin.ui.feature.server.signin
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,10 +13,12 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.KeyboardArrowLeft
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LargeTopAppBar
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -22,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
@@ -39,7 +45,7 @@ import com.chathil.kotlifin.ui.feature.server.mvi.Intent
 import com.chathil.kotlifin.ui.feature.server.mvi.State
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun ServerSignInScreen(
     state: State = State.Initial,
@@ -51,11 +57,13 @@ fun ServerSignInScreen(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
-                .padding(KotlifinTheme.dimensions.spacingMedium)
+                .padding(KotlifinTheme.dimensions.spacingMedium),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Sign In to ${state.newServer.name}",
-                style = MaterialTheme.typography.labelLarge
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.fillMaxWidth()
             )
             Spacer(modifier = Modifier.height(KotlifinTheme.dimensions.spacingXS))
             TextField(
@@ -74,11 +82,26 @@ fun ServerSignInScreen(
                 placeholder = { Text("Password") }
             )
             Spacer(modifier = Modifier.height(KotlifinTheme.dimensions.spacingSmall))
-            Button(
-                modifier = Modifier.fillMaxWidth(),
-                enabled = state.isCredentialValid(),
-                onClick = { dispatch(Intent.SignIn(state.username, state.pwd, state.newServer)) }) {
-                Text(text = "Sign In")
+
+            AnimatedContent(
+                targetState = state.isLoading,
+                label = "sign in animation"
+            ) { isLoading ->
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier.height(ButtonDefaults.MinHeight),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        LinearProgressIndicator(modifier = Modifier.padding(vertical = KotlifinTheme.dimensions.spacingMedium))
+                    }
+                } else {
+                    Button(
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = state.isCredentialValid(),
+                        onClick = { dispatch(Intent.SignIn(state.username, state.pwd, state.newServer)) }) {
+                        Text(text = "Sign In")
+                    }
+                }
             }
         }
     }

@@ -48,6 +48,7 @@ class HomeViewModel @Inject constructor(
             .map { result ->
                 Result.LoadLatestMediaResult(result, action.request.mediaType)
             }
+
         is Action.SaveActiveSession -> flowOf(Result.SaveActiveSession(action.session))
     }
 
@@ -59,9 +60,14 @@ class HomeViewModel @Inject constructor(
     override fun reducer(state: State, result: Result): State = when (result) {
         is Result.LoadLatestMediaResult -> when (result.data) {
             is Resource.Loading -> state.copy(isMediaLoading = state.isMediaLoading + mapOf(result.mediaType to true))
-            is Resource.Success -> state.copy(latestMedia = state.latestMedia + mapOf(result.mediaType to result.data.data))
+            is Resource.Success -> state.copy(
+                latestMedia = state.latestMedia + mapOf(result.mediaType to result.data.data),
+                isMediaLoading = state.isMediaLoading + mapOf(result.mediaType to false)
+            )
+
             is Resource.Error -> state.copy(error = result.data.error)
         }
+
         is Result.SaveActiveSession -> state.copy(activeSession = result.session)
     }
 }

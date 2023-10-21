@@ -50,7 +50,7 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
-            HomeSection(data = state.latestMedia)
+            HomeSection(state = state)
         }
     }
 }
