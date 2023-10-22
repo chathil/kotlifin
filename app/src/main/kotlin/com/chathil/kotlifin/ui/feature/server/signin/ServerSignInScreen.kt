@@ -21,6 +21,9 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -49,10 +52,18 @@ import com.chathil.kotlifin.ui.theme.KotlifinTheme
 @Composable
 fun ServerSignInScreen(
     state: State = State.Initial,
+    snackbarState: SnackbarHostState = remember {
+        SnackbarHostState()
+    },
     dispatch: (Intent) -> Unit = {},
     onBackPressed: () -> Unit = {}
 ) {
-    Scaffold(topBar = { SignInTopAppBar(onBackPressed) }) { padding ->
+    Scaffold(
+        topBar = { SignInTopAppBar(onBackPressed) },
+        snackbarHost = {
+            SnackbarHost(snackbarState)
+        }
+    ) { padding ->
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
@@ -98,7 +109,15 @@ fun ServerSignInScreen(
                     Button(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = state.isCredentialValid(),
-                        onClick = { dispatch(Intent.SignIn(state.username, state.pwd, state.newServer)) }) {
+                        onClick = {
+                            dispatch(
+                                Intent.SignIn(
+                                    state.username,
+                                    state.pwd,
+                                    state.newServer
+                                )
+                            )
+                        }) {
                         Text(text = "Sign In")
                     }
                 }
@@ -132,16 +151,32 @@ fun NavGraphBuilder.signInScreen(navController: NavController) {
         val parentEntry = remember(backStackEntry) {
             navController.getBackStackEntry(ServerListRoute)
         }
+        val snackbarState = remember {
+            SnackbarHostState()
+        }
+
         val viewModel: ServerManagementViewModel = hiltViewModel(parentEntry)
         val state by viewModel.viewStates.collectAsStateWithLifecycle()
+
         LaunchedEffect(Unit) {
             viewModel.viewEvents.collect { event ->
                 if (event is Event.NavigateToHome) navController.navigateToHomeScreen()
             }
         }
 
+        LaunchedEffect(state.error) {
+            if (state.error != null) {
+                snackbarState.showSnackbar(
+                    message = state.error?.message ?: "Something went wrong",
+                    withDismissAction = true,
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+
         ServerSignInScreen(
             state = state,
+            snackbarState = snackbarState,
             dispatch = viewModel::dispatch,
             onBackPressed = navController::navigateUp
         )

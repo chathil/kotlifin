@@ -28,6 +28,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.chathil.kotlifin.data.dto.request.media.MediaType
 import com.chathil.kotlifin.data.model.image.JellyfinImage
 import com.chathil.kotlifin.data.model.media.MediaSnippet
+import com.chathil.kotlifin.ui.feature.home.mvi.Intent
 import com.chathil.kotlifin.ui.feature.home.mvi.State
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_ASPECT_RATIO
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_POSTER_SIZE
@@ -39,7 +40,8 @@ import com.chathil.kotlifin.utils.asPagerData
 @Composable
 fun HomeSection(
     modifier: Modifier = Modifier,
-    state: State = State.Initial
+    state: State = State.Initial,
+    dispatch: (Intent) -> Unit = {}
 ) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
         // TODO: Make this generic
@@ -62,16 +64,21 @@ fun HomeSection(
             label = "latest media loading"
         ) { isNotLoading ->
             if (isNotLoading) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                ) {
-                    Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
-                    state.latestMedia[MediaType.MOVIE]?.forEach { item ->
-                        MediaCard(data = item)
+                val mediaErr = state.latestMediaLoadError[MediaType.MOVIE]
+                if (mediaErr == null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                    ) {
                         Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
+                        state.latestMedia[MediaType.MOVIE]?.forEach { item ->
+                            MediaCard(data = item)
+                            Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
+                        }
                     }
+                } else {
+                    HomeRetrySection(mediaType = MediaType.MOVIE, error = mediaErr, dispatch = dispatch)
                 }
             } else {
                 Box(
@@ -102,16 +109,21 @@ fun HomeSection(
             label = "latest media loading"
         ) { isNotLoading ->
             if (isNotLoading) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .horizontalScroll(rememberScrollState())
-                ) {
-                    Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
-                    state.latestMedia[MediaType.TV_SHOW]?.forEach { item ->
-                        MediaCard(data = item)
+                val mediaErr = state.latestMediaLoadError[MediaType.TV_SHOW]
+                if (mediaErr == null) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .horizontalScroll(rememberScrollState())
+                    ) {
                         Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
+                        state.latestMedia[MediaType.TV_SHOW]?.forEach { item ->
+                            MediaCard(data = item)
+                            Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
+                        }
                     }
+                } else {
+                    HomeRetrySection(mediaType = MediaType.TV_SHOW, error = mediaErr, dispatch = dispatch)
                 }
             } else {
                 Box(

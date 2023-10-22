@@ -7,6 +7,7 @@ import com.chathil.kotlifin.data.model.session.ActiveSession
 data class State(
     val isMediaLoading: Map<MediaType, Boolean>,
     val latestMedia: Map<MediaType, List<MediaSnippet>>,
+    val latestMediaLoadError: Map<MediaType, Throwable>,
     val activeSession: ActiveSession,
     val error: Throwable?
 ) {
@@ -17,6 +18,7 @@ data class State(
                 MediaType.TV_SHOW to false
             ),
             latestMedia = emptyMap(),
+            latestMediaLoadError = emptyMap(),
             activeSession = ActiveSession.Empty,
             error = null
         )

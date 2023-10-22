@@ -23,6 +23,10 @@ import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -47,16 +51,23 @@ import com.chathil.kotlifin.ui.feature.server.signin.navigateToSignIn
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_ASPECT_RATIO
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_POSTER_SIZE
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
+import okhttp3.HttpUrl
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun AddServerScreen(
     state: State = State.Initial,
+    snackbarState: SnackbarHostState = remember {
+        SnackbarHostState()
+    },
     dispatch: (Intent) -> Unit = {},
     onBackPressed: () -> Unit = {}
 ) {
     Scaffold(
-        topBar = { AddServerTopAppBar(onBackPressed) }
+        topBar = { AddServerTopAppBar(onBackPressed) },
+        snackbarHost = {
+            SnackbarHost(snackbarState)
+        }
     ) { padding ->
         Column(
             modifier = Modifier
@@ -129,6 +140,9 @@ fun NavGraphBuilder.addServerScreen(navController: NavController) {
         val parentEntry = remember(backStackEntry) {
             navController.getBackStackEntry(ServerListRoute)
         }
+        val snackbarState = remember {
+            SnackbarHostState()
+        }
         val viewModel: ServerManagementViewModel = hiltViewModel(parentEntry)
         val state by viewModel.viewStates.collectAsStateWithLifecycle()
 
@@ -142,8 +156,19 @@ fun NavGraphBuilder.addServerScreen(navController: NavController) {
             }
         }
 
+        LaunchedEffect(state.error) {
+            if (state.error != null) {
+                snackbarState.showSnackbar(
+                    message = state.error?.message ?: "Something went wrong",
+                    withDismissAction = true,
+                    duration = SnackbarDuration.Short
+                )
+            }
+        }
+
         AddServerScreen(
             state = state,
+            snackbarState = snackbarState,
             dispatch = viewModel::dispatch,
             onBackPressed = navController::navigateUp
         )
@@ -159,5 +184,13 @@ fun NavController.navigateToAddServerScreen() {
 private fun AddServerScreenPreview() {
     KotlifinTheme {
         AddServerScreen()
+    }
+}
+
+@Preview
+@Composable
+private fun AddServerScreenErrorPreview() {
+    KotlifinTheme {
+        AddServerScreen(state = State.Initial.copy(error = NullPointerException("Unpossible!")))
     }
 }
