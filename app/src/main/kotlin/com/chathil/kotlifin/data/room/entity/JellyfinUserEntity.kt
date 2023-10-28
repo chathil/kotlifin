@@ -9,6 +9,7 @@ import com.chathil.kotlifin.data.model.user.JellyfinUser
 data class JellyfinUserEntity(
     @PrimaryKey val id: String,
     val name: String,
+    @ColumnInfo("device_info_post_fix") val deviceInfoPostFix: String,
     @ColumnInfo("server_id") val serverId: String,
     @ColumnInfo("primary_image_tag") val primaryImageTag: String,
     @ColumnInfo("has_password") val hasPassword: Boolean,
@@ -28,7 +29,8 @@ fun JellyfinUserEntity.toJellyfinUser(): JellyfinUser {
         hasConfiguredPassword = hasConfiguredPassword,
         hasConfiguredEasyPassword = hasConfiguredEasyPassword,
         enableAutoLogin = enableAutoLogin,
-        accessToken = accessToken
+        accessToken = accessToken,
+        deviceUuid = deviceInfoPostFix
     )
 }
 

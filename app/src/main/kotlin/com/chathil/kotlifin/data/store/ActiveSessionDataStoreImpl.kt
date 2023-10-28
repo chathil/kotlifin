@@ -21,7 +21,8 @@ class ActiveSessionDataStoreImpl(
                     server_public_address = session.serverPublicAddress,
                     server_local_address = session.serverLocalAddress,
                     server_name = session.serverName,
-                    access_token = session.accessToken
+                    access_token = session.accessToken,
+                    device_uuid = session.deviceUuid
                 )
             }
     }

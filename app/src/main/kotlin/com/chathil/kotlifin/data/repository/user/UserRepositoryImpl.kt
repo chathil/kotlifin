@@ -1,5 +1,8 @@
 package com.chathil.kotlifin.data.repository.user
 
+import com.chathil.kotlifin.data.cache.Constants
+import com.chathil.kotlifin.data.cache.InMemoryCache
+import com.chathil.kotlifin.data.cache.NewSessionInMemoryCache
 import com.chathil.kotlifin.data.dto.extension.toActiveSession
 import com.chathil.kotlifin.data.dto.extension.toJellyfinUser
 import com.chathil.kotlifin.data.model.server.JellyfinServer
@@ -24,13 +27,15 @@ import org.jellyfin.sdk.api.client.Response
 import org.jellyfin.sdk.api.client.exception.ApiClientException
 import org.jellyfin.sdk.api.client.extensions.authenticateUserByName
 import org.jellyfin.sdk.api.client.extensions.userApi
+import org.jellyfin.sdk.model.UUID
 import org.jellyfin.sdk.model.api.AuthenticationResult
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
     jellyfin: Jellyfin,
     private val activeSession: ActiveSessionDataStore,
-    private val localDataSource: KotlifinDb
+    private val localDataSource: KotlifinDb,
+    private val inMemoryCache: InMemoryCache<String, String>,
 ) : UserRepository, BaseRepository(jellyfin, activeSession) {
 
     override fun signIn(
@@ -38,17 +43,20 @@ class UserRepositoryImpl @Inject constructor(
         pwd: String,
         server: JellyfinServer
     ): Flow<Resource<JellyfinUser>> {
-        return api(server.publicAddress).map { api ->
+        val deviceUuid = inMemoryCache.fetch(Constants.NEW_USER_DEVICE_POST_FIX)
+            ?: inMemoryCache.store(Constants.NEW_USER_DEVICE_POST_FIX, UUID.randomUUID().toString())
+
+        return api(server.publicAddress, deviceUuid).map { api ->
             api.userApi.authenticateUserByName(username, pwd)
         }
             .map<Response<AuthenticationResult>, Resource<JellyfinUser>> { response ->
                 val user = response.content.user ?: throw ApiClientException("Invalid credential")
-                activeSession.changeSession(response.content.toActiveSession(server))
+                activeSession.changeSession(response.content.toActiveSession(server, deviceUuid))
                 localDataSource.serverDao().insert(server.toJellyfinServerEntity())
                 localDataSource.userDao().insert(
-                    user.toJellyfinUser(response.content.accessToken ?: "").toJellyfinUserEntity()
+                    user.toJellyfinUser(response.content.accessToken ?: "", deviceUuid).toJellyfinUserEntity()
                 )
-                Resource.Success(user.toJellyfinUser(response.content.accessToken ?: ""))
+                Resource.Success(user.toJellyfinUser(response.content.accessToken ?: "", deviceUuid))
             }.onStart { emit(Resource.Loading()) }
             .catch { error -> emit(Resource.Error(error)) }
     }
@@ -59,7 +67,7 @@ class UserRepositoryImpl @Inject constructor(
         }.flatMapLatest {
             localDataSource.userDao().loadUsersByServerId(serverId)
         }.map<List<JellyfinUserEntity>, Resource<Unit>> { users ->
-            if(users.isEmpty()) {
+            if (users.isEmpty()) {
                 localDataSource.serverDao().deleteServerById(serverId)
             }
             Resource.Success(Unit)

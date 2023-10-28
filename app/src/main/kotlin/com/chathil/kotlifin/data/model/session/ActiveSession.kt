@@ -7,7 +7,8 @@ data class ActiveSession(
     val serverPublicAddress: String,
     val serverLocalAddress: String,
     val serverName: String,
-    val accessToken: String
+    val accessToken: String,
+    val deviceUuid: String
 ) {
     companion object {
         val Empty = ActiveSession(
@@ -17,7 +18,8 @@ data class ActiveSession(
             serverPublicAddress = "",
             serverLocalAddress = "",
             serverName = "",
-            accessToken = ""
+            accessToken = "",
+            deviceUuid = ""
         )
     }
 }

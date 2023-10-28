@@ -10,4 +10,5 @@ message ActiveSessionProto {
   string server_local_address = 5;
   string server_name = 6;
   string access_token = 7;
+  string device_uuid = 8;
 }

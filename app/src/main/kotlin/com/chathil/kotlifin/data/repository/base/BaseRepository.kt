@@ -8,6 +8,8 @@ import org.jellyfin.sdk.Jellyfin
 import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.HttpClientOptions
 import org.jellyfin.sdk.api.client.exception.ApiClientException
+import org.jellyfin.sdk.api.client.extensions.moviesApi
+import org.jellyfin.sdk.model.DeviceInfo
 import org.jellyfin.sdk.model.serializer.toUUID
 
 abstract class BaseRepository(
@@ -16,7 +18,7 @@ abstract class BaseRepository(
 ) {
 
     // TODO: Try to access serverLocalAddress first
-    fun api(serverAddress: String = ""): Flow<ApiClient> {
+    fun api(serverAddress: String = "", deviceInfoPostFix: String = ""): Flow<ApiClient> {
         return activeSession.activeSession
             .take(1)
             .map { session ->
@@ -24,6 +26,10 @@ abstract class BaseRepository(
                     serverAddress.ifBlank { session.serverPublicAddress },
                     session.accessToken.ifBlank { null },
                     session.userId.ifBlank { null }?.toUUID(),
+                    deviceInfo = DeviceInfo(
+                        "android+${deviceInfoPostFix.ifBlank { session.deviceUuid }}",
+                        "Android"
+                    )
                 )
             }
     }

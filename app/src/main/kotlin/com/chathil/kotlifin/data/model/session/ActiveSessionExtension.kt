@@ -8,6 +8,7 @@ fun ActiveSessionProto.toActiveSession(): ActiveSession {
         serverId = server_id,
         serverLocalAddress = server_local_address,
         serverName = server_name,
-        accessToken = access_token
+        accessToken = access_token,
+        deviceUuid = device_uuid
     )
 }

@@ -223,7 +223,8 @@ private fun ActiveSessionPreview() {
                 serverPublicAddress = "https://demo.jellyfin.org/unstable",
                 serverLocalAddress = "http://192.168.0.101:8096",
                 serverName = "Unstable",
-                accessToken = ""
+                accessToken = "",
+                deviceUuid = ""
             ),
             jellyfinServer = JellyfinServer(
                 id = "",

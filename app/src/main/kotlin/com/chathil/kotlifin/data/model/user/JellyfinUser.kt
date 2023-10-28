@@ -11,7 +11,8 @@ data class JellyfinUser(
     val hasConfiguredPassword: Boolean,
     val hasConfiguredEasyPassword: Boolean,
     val enableAutoLogin: Boolean,
-    val accessToken: String
+    val accessToken: String,
+    val deviceUuid: String
 ) {
     companion object {
         val Empty = JellyfinUser(
@@ -23,7 +24,8 @@ data class JellyfinUser(
             hasConfiguredPassword = false,
             hasConfiguredEasyPassword = false,
             enableAutoLogin = false,
-            accessToken = ""
+            accessToken = "",
+            deviceUuid = ""
         )
     }
 }
@@ -38,6 +40,7 @@ fun JellyfinUser.toJellyfinUserEntity(): JellyfinUserEntity {
         hasConfiguredPassword = hasConfiguredPassword,
         hasConfiguredEasyPassword = hasConfiguredEasyPassword,
         enableAutoLogin = enableAutoLogin,
-        accessToken = accessToken
+        accessToken = accessToken,
+        deviceInfoPostFix = deviceUuid
     )
 }

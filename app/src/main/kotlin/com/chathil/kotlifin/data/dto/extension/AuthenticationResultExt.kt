@@ -5,7 +5,8 @@ import com.chathil.kotlifin.data.model.session.ActiveSession
 import org.jellyfin.sdk.model.api.AuthenticationResult
 
 fun AuthenticationResult.toActiveSession(
-    server: JellyfinServer
+    server: JellyfinServer,
+    deviceUuid: String
 ): ActiveSession {
     return ActiveSession(
         userId = user?.id.toString(),
@@ -14,6 +15,7 @@ fun AuthenticationResult.toActiveSession(
         serverPublicAddress = server.publicAddress,
         serverLocalAddress = server.localAddress,
         serverName = server.name,
-        accessToken = accessToken ?: ""
+        accessToken = accessToken ?: "",
+        deviceUuid = deviceUuid
     )
 }

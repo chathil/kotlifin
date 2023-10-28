@@ -52,8 +52,7 @@ object DataModule {
     @Singleton
     fun provideJellyfinSdk(@ApplicationContext appContext: Context): Jellyfin {
         return createJellyfin {
-            clientInfo = ClientInfo("Jellyfin Sample: Kotlin CLI", "DEV")
-            deviceInfo = DeviceInfo("cli", "cli")
+            clientInfo = ClientInfo("Kotlifin: Jellyfin + JetpackCompose", "DEV")
             context = appContext
         }
     }

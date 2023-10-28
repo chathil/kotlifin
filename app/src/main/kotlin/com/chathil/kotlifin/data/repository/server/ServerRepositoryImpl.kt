@@ -1,5 +1,8 @@
 package com.chathil.kotlifin.data.repository.server
 
+import com.chathil.kotlifin.data.cache.Constants
+import com.chathil.kotlifin.data.cache.InMemoryCache
+import com.chathil.kotlifin.data.cache.NewSessionInMemoryCache
 import com.chathil.kotlifin.data.dto.extension.toJellyfinServer
 import com.chathil.kotlifin.data.model.server.JellyfinServer
 import com.chathil.kotlifin.data.model.server.toJellyfinServerEntity
@@ -29,12 +32,14 @@ import org.jellyfin.sdk.api.client.extensions.systemApi
 import org.jellyfin.sdk.api.operations.SystemApi
 import org.jellyfin.sdk.model.api.PublicSystemInfo
 import org.jellyfin.sdk.model.serializer.toUUID
+import java.util.UUID
 import javax.inject.Inject
 
 class ServerRepositoryImpl @Inject constructor(
     jellyfin: Jellyfin,
     activeSession: ActiveSessionDataStore,
-    private val localDataSource: KotlifinDb
+    private val localDataSource: KotlifinDb,
+    private val inMemoryCache: InMemoryCache<String, String>,
 ) : ServerRepository, BaseRepository(jellyfin, activeSession) {
 
     override fun addServer(server: JellyfinServer): Flow<Resource<Unit>> {
@@ -84,7 +89,9 @@ class ServerRepositoryImpl @Inject constructor(
     }
 
     override fun connectToServer(serverAddress: String): Flow<Resource<JellyfinServer>> {
-        return api(serverAddress).map { client -> client.systemApi }
+        val deviceUuid = inMemoryCache.store(Constants.NEW_USER_DEVICE_POST_FIX, UUID.randomUUID().toString())
+        return api(serverAddress, deviceUuid)
+            .map { client -> client.systemApi }
             .map(SystemApi::getPublicSystemInfo)
             .map<Response<PublicSystemInfo>, Resource<JellyfinServer>> { sysInfoResponse ->
                 Resource.Success(sysInfoResponse.content.toJellyfinServer(serverAddress))

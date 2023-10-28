@@ -52,7 +52,8 @@ class UsersViewModel @Inject constructor(
                     action.server.publicAddress,
                     action.server.localAddress,
                     action.server.name,
-                    action.user.accessToken
+                    action.user.accessToken,
+                    action.user.deviceUuid
                 )
             )
             result
