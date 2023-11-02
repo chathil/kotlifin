@@ -1,10 +1,10 @@
-package com.chathil.kotlifin.data.dto.request.movie
+package com.chathil.kotlifin.data.dto.request.show
 
 import com.chathil.kotlifin.data.dto.request.media.OrderBy
 import com.chathil.kotlifin.data.dto.request.media.SortBy
 import com.chathil.kotlifin.data.dto.request.paged.JellyfinPagedRequest
 
-data class LatestMoviesRequest(
+class ShowNextUpRequest(
     override val startIndex: Int,
     override val orderBy: OrderBy = OrderBy.DATE_CREATED,
     override val sortBy: SortBy = SortBy.DESCENDING,
@@ -12,6 +12,6 @@ data class LatestMoviesRequest(
     override val limit: Int = 10
 ) : JellyfinPagedRequest() {
     companion object {
-        val Initial = LatestMoviesRequest(startIndex = 0)
+        val Initial = ShowNextUpRequest(startIndex = 0)
     }
 }

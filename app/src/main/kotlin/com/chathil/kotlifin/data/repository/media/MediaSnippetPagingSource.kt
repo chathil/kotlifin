@@ -1,71 +1,26 @@
 package com.chathil.kotlifin.data.repository.media
 
-import androidx.paging.PagingSource
-import androidx.paging.PagingState
+import com.chathil.kotlifin.data.api.JellyfinSDKPagingSource
 import com.chathil.kotlifin.data.dto.extension.asMediaSnippet
 import com.chathil.kotlifin.data.dto.request.movie.LatestMoviesRequest
-import com.chathil.kotlifin.data.dto.request.media.SortBy
 import com.chathil.kotlifin.data.model.media.MediaSnippet
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.single
 import org.jellyfin.sdk.api.client.ApiClient
+import org.jellyfin.sdk.api.client.Response
 import org.jellyfin.sdk.api.client.extensions.itemsApi
-import org.jellyfin.sdk.model.api.request.GetItemsRequest
+import org.jellyfin.sdk.model.api.BaseItemDto
+import org.jellyfin.sdk.model.api.BaseItemDtoQueryResult
 
 class MediaSnippetPagingSource(
-    private val api: () -> Flow<ApiClient>,
+    api: () -> Flow<ApiClient>,
     private val request: LatestMoviesRequest
-) : PagingSource<Int, MediaSnippet>() {
+) : JellyfinSDKPagingSource<MediaSnippet>(api, request) {
 
-    override suspend fun load(params: LoadParams<Int>): LoadResult<Int, MediaSnippet> {
-        val currentIndex = params.key ?: 0
-        val newRequest = request.copy(startIndex = currentIndex)
-        val itemRequest = GetItemsRequest(
-            isMovie = true,
-            sortOrder = listOf(SortBy.toJellyfinSortOrder(newRequest.sortBy)),
-            sortBy = listOf(newRequest.orderBy.rawValue),
-            startIndex = newRequest.startIndex,
-            limit = newRequest.limit,
-        )
-
-        // get the index of the last items and pass it
-        return api().map { client ->
-            client.itemsApi.getItems(itemRequest).content to client
-        }.map { (pagedResult, client) ->
-            val beforeItemCount =
-                if (currentIndex > 1) (currentIndex - pagedResult.startIndex) * newRequest.limit else 0
-            val nextItemCount =
-                if (currentIndex < pagedResult.totalRecordCount) {
-                    pagedResult.totalRecordCount - (beforeItemCount + (pagedResult.items?.size
-                        ?: 0))
-                } else {
-                    LoadResult.Page.COUNT_UNDEFINED
-                }
-
-            LoadResult.Page(
-                data = pagedResult.items?.map { it.asMediaSnippet(client.baseUrl ?: "") }
-                    ?: emptyList(),
-                nextKey = if (currentIndex < pagedResult.totalRecordCount) {
-                    currentIndex + (pagedResult.items?.size ?: 0)
-                } else {
-                    null
-                },
-                prevKey = if (currentIndex > 1) {
-                    currentIndex - (pagedResult.items?.size ?: 0)
-                } else {
-                    null
-                },
-                itemsBefore = beforeItemCount,
-                itemsAfter = nextItemCount
-            )
-        }.catch<LoadResult<Int, MediaSnippet>> { error ->
-            emit(LoadResult.Error(error))
-        }.single()
+    override fun mapResponse(response: BaseItemDto): MediaSnippet {
+        return response.asMediaSnippet(baseUrl)
     }
 
-    override val jumpingSupported: Boolean = true
-
-    override fun getRefreshKey(state: PagingState<Int, MediaSnippet>): Int? = null
+    override suspend fun invokeApiCall(api: ApiClient): Response<BaseItemDtoQueryResult> {
+        return api.itemsApi.getItems(request.asGetItemRequest())
+    }
 }

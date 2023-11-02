@@ -4,6 +4,7 @@ import com.chathil.kotlifin.data.model.image.JellyfinImage
 import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.data.model.media.MediaState
 import com.chathil.kotlifin.data.model.media.NowWatching
+import com.chathil.kotlifin.data.model.show.ShowNextUp
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_ASPECT_RATIO
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_POSTER_SIZE
 import org.jellyfin.sdk.model.api.BaseItemDto
@@ -25,7 +26,6 @@ fun BaseItemDto.asMediaSnippet(baseUrl: String): MediaSnippet {
 }
 
 fun BaseItemDto.asNowWatching(baseUrl: String): NowWatching {
-    Timber.tag("AsNowWatching").i(this.toString())
     return when (type) {
         BaseItemKind.MOVIE -> {
             NowWatching.Movie(
@@ -82,4 +82,20 @@ fun BaseItemDto.asNowWatching(baseUrl: String): NowWatching {
             )
         }
     }
+}
+
+fun BaseItemDto.asShowNextUp(baseUrl: String): ShowNextUp {
+    return ShowNextUp(
+        id = id.toString(),
+        title = seriesName ?: "",
+        img = JellyfinImage(
+            baseUrl = baseUrl,
+            itemId = parentBackdropItemId.toString(),
+            imageTag = parentBackdropImageTags?.get(0) ?: "",
+            imageType = ImageType.BACKDROP
+        ),
+        season = parentIndexNumber ?: 0,
+        eps = indexNumber ?: 0,
+        epsTitle = name ?: ""
+    )
 }
