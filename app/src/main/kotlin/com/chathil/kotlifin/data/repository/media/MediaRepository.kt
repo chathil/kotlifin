@@ -3,6 +3,7 @@ package com.chathil.kotlifin.data.repository.media
 import androidx.paging.Pager
 import com.chathil.kotlifin.data.dto.request.media.LatestMediaRequest
 import com.chathil.kotlifin.data.dto.request.movie.LatestMoviesRequest
+import com.chathil.kotlifin.data.dto.request.media.NowWatchingRequest
 import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.data.model.media.NowWatching
 import com.chathil.kotlifin.data.vo.Resource
@@ -10,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface MediaRepository {
 
-    fun fetchNowWatching(): Flow<Resource<NowWatching>>
+    fun fetchNowWatching(request: NowWatchingRequest): Pager<Int, NowWatching>
 
     fun fetchRecentlyAdded(): Flow<Resource<MediaSnippet>>
 

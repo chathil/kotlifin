@@ -1,4 +1,4 @@
-package com.chathil.kotlifin.data.dto.request.movie
+package com.chathil.kotlifin.data.dto.request.media
 
 import org.jellyfin.sdk.model.api.SortOrder
 

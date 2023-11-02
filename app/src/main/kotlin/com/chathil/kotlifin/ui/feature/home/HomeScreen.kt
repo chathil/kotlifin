@@ -1,7 +1,11 @@
 package com.chathil.kotlifin.ui.feature.home
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -21,12 +25,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.chathil.kotlifin.data.dto.request.media.MediaType
 import com.chathil.kotlifin.data.model.image.JellyfinImage
 import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.ui.feature.home.mvi.Intent
 import com.chathil.kotlifin.ui.feature.home.mvi.State
 import com.chathil.kotlifin.ui.feature.home.pieces.HomeSection
+import com.chathil.kotlifin.ui.feature.home.pieces.InProgressCard
+import com.chathil.kotlifin.ui.feature.home.pieces.InProgressCardLoading
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,6 +45,8 @@ fun HomeScreen(
     goToDetail: () -> Unit = {},
     goToSettings: () -> Unit = {}
 ) {
+    val nowWatchingPagingItem = state.nowWatchingPager?.flow?.collectAsLazyPagingItems()
+
     Scaffold(
         topBar = {
             HomeTopAppBar(
@@ -50,10 +60,40 @@ fun HomeScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
+            LazyRow(modifier = Modifier.fillMaxWidth()) {
+
+                item {
+                    Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
+                }
+
+                items(count = nowWatchingPagingItem?.itemCount ?: 0) { idx ->
+                    nowWatchingPagingItem?.get(idx)?.let { item ->
+                        InProgressCard(media = item)
+                        Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
+                    }
+                }
+
+                if (nowWatchingPagingItem?.loadState?.refresh is LoadState.Loading || state.isNowWatchingLoading) {
+                    items(NOW_WATCHING_PLACEHOLDER_COUNT) {
+                        InProgressCardLoading()
+                        Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
+                    }
+                }
+
+                item {
+                    (
+                            nowWatchingPagingItem?.loadState?.refresh as? LoadState.Error
+                                ?: nowWatchingPagingItem?.loadState?.append as? LoadState.Error
+                            )
+                        ?.let { error -> Text(error.error.message ?: "") }
+                }
+            }
             HomeSection(state = state, dispatch = dispatch)
         }
     }
 }
+
+private const val NOW_WATCHING_PLACEHOLDER_COUNT = 4
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

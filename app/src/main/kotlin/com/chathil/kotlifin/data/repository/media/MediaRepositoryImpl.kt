@@ -6,9 +6,9 @@ import com.chathil.kotlifin.data.dto.extension.asMediaSnippet
 import com.chathil.kotlifin.data.dto.request.media.LatestMediaRequest
 import com.chathil.kotlifin.data.dto.request.media.toJellyfinRequest
 import com.chathil.kotlifin.data.dto.request.movie.LatestMoviesRequest
+import com.chathil.kotlifin.data.dto.request.media.NowWatchingRequest
 import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.data.model.media.NowWatching
-import com.chathil.kotlifin.data.model.session.ActiveSession
 import com.chathil.kotlifin.data.repository.base.BaseRepository
 import com.chathil.kotlifin.data.store.ActiveSessionDataStore
 import com.chathil.kotlifin.data.vo.Resource
@@ -18,10 +18,7 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import org.jellyfin.sdk.Jellyfin
-import org.jellyfin.sdk.api.client.Response
 import org.jellyfin.sdk.api.client.extensions.userLibraryApi
-import org.jellyfin.sdk.model.api.AuthenticationResult
-import org.jellyfin.sdk.model.api.BaseItemDto
 import javax.inject.Inject
 
 class MediaRepositoryImpl @Inject constructor(
@@ -33,8 +30,14 @@ class MediaRepositoryImpl @Inject constructor(
         private const val JUMP_THRESHOLD_MULTIPLIER = 3
     }
 
-    override fun fetchNowWatching(): Flow<Resource<NowWatching>> {
-        TODO("Not yet implemented")
+    override fun fetchNowWatching(request: NowWatchingRequest): Pager<Int, NowWatching> {
+        return Pager(
+            config = PagingConfig(
+                pageSize = request.limit,
+                prefetchDistance = request.prefetchDistance,
+                jumpThreshold = JUMP_THRESHOLD_MULTIPLIER * request.limit
+            )
+        ) { NowWatchingPagingSource(::api, request) }
     }
 
     override fun fetchRecentlyAdded(): Flow<Resource<MediaSnippet>> {

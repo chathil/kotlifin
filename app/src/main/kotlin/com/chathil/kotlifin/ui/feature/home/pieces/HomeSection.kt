@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -23,8 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.paging.Pager
-import androidx.paging.compose.collectAsLazyPagingItems
 import com.chathil.kotlifin.data.dto.request.media.MediaType
 import com.chathil.kotlifin.data.model.image.JellyfinImage
 import com.chathil.kotlifin.data.model.media.MediaSnippet
@@ -34,7 +31,6 @@ import com.chathil.kotlifin.ui.shared.MEDIA_CARD_ASPECT_RATIO
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_POSTER_SIZE
 import com.chathil.kotlifin.ui.shared.MediaCard
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
-import com.chathil.kotlifin.utils.asPagerData
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable

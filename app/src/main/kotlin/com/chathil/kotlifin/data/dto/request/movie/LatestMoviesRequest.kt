@@ -1,5 +1,8 @@
 package com.chathil.kotlifin.data.dto.request.movie
 
+import com.chathil.kotlifin.data.dto.request.media.OrderBy
+import com.chathil.kotlifin.data.dto.request.media.SortBy
+
 data class LatestMoviesRequest(
     val startIndex: Int,
     val orderBy: OrderBy = OrderBy.DATE_CREATED,
