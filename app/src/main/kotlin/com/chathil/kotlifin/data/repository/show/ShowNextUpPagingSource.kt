@@ -6,6 +6,7 @@ import com.chathil.kotlifin.data.dto.request.show.ShowNextUpRequest
 import com.chathil.kotlifin.data.model.show.ShowNextUp
 import kotlinx.coroutines.flow.Flow
 import org.jellyfin.sdk.api.client.ApiClient
+import org.jellyfin.sdk.api.client.Response
 import org.jellyfin.sdk.api.client.extensions.tvShowsApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemDtoQueryResult
@@ -19,9 +20,9 @@ class ShowNextUpPagingSource(
         return response.asShowNextUp(baseUrl)
     }
 
-    override suspend fun invokeApiCall(api: ApiClient): BaseItemDtoQueryResult {
+    override suspend fun invokeApiCall(api: ApiClient): Response<BaseItemDtoQueryResult> {
         return api.userId?.let { uid ->
-            api.tvShowsApi.getNextUp(userId = uid).content
+            api.tvShowsApi.getNextUp(userId = uid)
         } ?: throw NullPointerException("Missing uid in the request")
     }
 }
