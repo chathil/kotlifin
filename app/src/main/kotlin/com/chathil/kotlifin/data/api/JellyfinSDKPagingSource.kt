@@ -11,6 +11,7 @@ import org.jellyfin.sdk.api.client.ApiClient
 import org.jellyfin.sdk.api.client.Response
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemDtoQueryResult
+import org.jellyfin.sdk.model.api.request.GetItemsRequest
 import javax.net.ssl.HttpsURLConnection
 
 abstract class JellyfinSDKPagingSource<T : Any>(
@@ -18,24 +19,18 @@ abstract class JellyfinSDKPagingSource<T : Any>(
     private val request: JellyfinPagedRequest
 ) : PagingSource<Int, T>() {
 
-    companion object {
-        private const val DEFAULT_PAGE_SIZE = 10
-    }
-
     override fun getRefreshKey(state: PagingState<Int, T>): Int? = null
 
     var baseUrl = ""
 
     abstract fun mapResponse(response: BaseItemDto): T
-    abstract suspend fun invokeApiCall(api: ApiClient): Response<BaseItemDtoQueryResult>
+    abstract suspend fun invokeApiCall(api: ApiClient, params: LoadParams<Int>): Response<BaseItemDtoQueryResult>
 
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, T> {
         val currentIndex = params.key ?: 0
-        val itemRequest = request.asGetItemRequest().copy(startIndex = currentIndex)
-
         return api().map { client ->
             baseUrl = client.baseUrl ?: ""
-            invokeApiCall(client)
+            invokeApiCall(client, params)
         }.map { response ->
             return@map if (response.status.toString()
                     .startsWith(HttpsURLConnection.HTTP_OK.toString().first()).not()
@@ -45,8 +40,7 @@ abstract class JellyfinSDKPagingSource<T : Any>(
 
                 val pagedResult = response.content
                 val beforeItemCount =
-                    if (currentIndex > 1) (currentIndex - pagedResult.startIndex) * (itemRequest.limit
-                        ?: DEFAULT_PAGE_SIZE) else 0
+                    if (currentIndex > 1) (currentIndex - pagedResult.startIndex) * request.limit else 0
                 val nextItemCount =
                     if (currentIndex < pagedResult.totalRecordCount) {
                         pagedResult.totalRecordCount - (beforeItemCount + (pagedResult.items?.size

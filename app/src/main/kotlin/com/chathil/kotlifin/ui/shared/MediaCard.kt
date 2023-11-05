@@ -21,15 +21,15 @@ import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import com.chathil.kotlifin.data.model.image.JellyfinImage
 import com.chathil.kotlifin.data.model.media.MediaSnippet
+import com.chathil.kotlifin.data.model.media.MediaState
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
-import org.jellyfin.sdk.model.api.ImageType
 
 @Composable
 fun MediaCard(modifier: Modifier = Modifier, data: MediaSnippet) {
     Column(modifier = modifier) {
         Card(modifier = Modifier.size(posterSize)) {
             AsyncImage(
-                model = data.posterImg.constructUrl(
+                model = data.img.constructUrl(
                     MEDIA_CARD_POSTER_SIZE * MEDIA_CARD_ASPECT_RATIO.first,
                     MEDIA_CARD_POSTER_SIZE * MEDIA_CARD_ASPECT_RATIO.second,
                 ),
@@ -65,9 +65,10 @@ private fun MediaCardPreview() {
     KotlifinTheme {
         Box(modifier = Modifier.padding(8.dp)) {
             MediaCard(
-                data = MediaSnippet(
+                data = MediaSnippet.Movie(
                     "",
                     "Simple Jack",
+                    MediaState.Empty,
                     JellyfinImage.Empty
                 )
             )

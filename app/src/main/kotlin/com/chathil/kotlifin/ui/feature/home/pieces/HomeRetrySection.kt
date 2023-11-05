@@ -23,9 +23,8 @@ import com.chathil.kotlifin.ui.theme.KotlifinTheme
 
 @Composable
 fun HomeRetrySection(
-    mediaType: MediaType,
     error: Throwable,
-    dispatch: (Intent) -> Unit = {}
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -42,7 +41,7 @@ fun HomeRetrySection(
             )
         )
         OutlinedButton(
-            onClick = { dispatch(Intent.LoadLatestMedia(LatestMediaRequest(mediaType))) },
+            onClick = onClick,
             modifier = Modifier.padding(KotlifinTheme.dimensions.spacingMedium),
             colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.onErrorContainer)
         ) {
@@ -56,7 +55,6 @@ fun HomeRetrySection(
 private fun HomeRetrySectionPreview() {
     KotlifinTheme {
         HomeRetrySection(
-            mediaType = MediaType.MOVIE,
             error = NullPointerException("This isn't happening")
         )
     }

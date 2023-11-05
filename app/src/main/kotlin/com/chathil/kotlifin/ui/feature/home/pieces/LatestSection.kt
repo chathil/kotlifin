@@ -22,9 +22,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.chathil.kotlifin.data.dto.request.media.LatestMediaRequest
 import com.chathil.kotlifin.data.dto.request.media.MediaType
 import com.chathil.kotlifin.data.model.image.JellyfinImage
 import com.chathil.kotlifin.data.model.media.MediaSnippet
+import com.chathil.kotlifin.data.model.media.MediaState
 import com.chathil.kotlifin.ui.feature.home.mvi.Intent
 import com.chathil.kotlifin.ui.feature.home.mvi.State
 import com.chathil.kotlifin.ui.shared.MEDIA_CARD_ASPECT_RATIO
@@ -34,7 +36,7 @@ import com.chathil.kotlifin.ui.theme.KotlifinTheme
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HomeSection(
+fun LatestSection(
     modifier: Modifier = Modifier,
     state: State = State.Initial,
     dispatch: (Intent) -> Unit = {}
@@ -74,7 +76,9 @@ fun HomeSection(
                         }
                     }
                 } else {
-                    HomeRetrySection(mediaType = MediaType.MOVIE, error = mediaErr, dispatch = dispatch)
+                    HomeRetrySection(error = mediaErr) {
+                        dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.MOVIE)))
+                    }
                 }
             } else {
                 Box(
@@ -119,7 +123,9 @@ fun HomeSection(
                         }
                     }
                 } else {
-                    HomeRetrySection(mediaType = MediaType.TV_SHOW, error = mediaErr, dispatch = dispatch)
+                    HomeRetrySection(error = mediaErr) {
+                        dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.TV_SHOW)))
+                    }
                 }
             } else {
                 Box(
@@ -138,7 +144,7 @@ fun HomeSection(
 private fun HomeSectionPreview() {
     KotlifinTheme {
         Box {
-            HomeSection(
+            LatestSection(
                 state = State.Initial.copy(
                     isMediaLoading = mapOf(
                         MediaType.MOVIE to true,
@@ -146,26 +152,81 @@ private fun HomeSectionPreview() {
                     ),
                     latestMedia = mapOf(
                         MediaType.MOVIE to listOf(
-                            MediaSnippet("1", "Simple Jack", JellyfinImage.Empty),
-                            MediaSnippet(
-                                "2",
-                                "Global Metldown: Melting Again & Again",
-                                JellyfinImage.Empty
+                            MediaSnippet.Movie(
+                                id = "1",
+                                title = "Simple Jack",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty
                             ),
-                            MediaSnippet("3", "Satan's Alley", JellyfinImage.Empty),
-                            MediaSnippet("4", "Fart", JellyfinImage.Empty),
-                            MediaSnippet("5", "Fart 2", JellyfinImage.Empty)
+                            MediaSnippet.Movie(
+                                id = "2",
+                                title = "Global Metldown: Melting Again & Again",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty
+                            ),
+                            MediaSnippet.Movie(
+                                id = "3",
+                                title = "Satan's Alley",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty
+                            ),
+                            MediaSnippet.Movie(
+                                id = "4",
+                                title = "Fart",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty
+                            ),
+                            MediaSnippet.Movie(
+                                id = "5",
+                                title = "Fart 2",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty
+                            )
                         ),
                         MediaType.TV_SHOW to listOf(
-                            MediaSnippet("1", "Simple Jack", JellyfinImage.Empty),
-                            MediaSnippet(
-                                "2",
-                                "Global Metldown: Melting Again & Again",
-                                JellyfinImage.Empty
+                            MediaSnippet.Show(
+                                id = "1",
+                                title = "Simple Jack",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty,
+                                season = 1,
+                                eps = 2,
+                                epsTitle = "Prologue"
                             ),
-                            MediaSnippet("3", "Satan's Alley", JellyfinImage.Empty),
-                            MediaSnippet("4", "Fart", JellyfinImage.Empty),
-                            MediaSnippet("5", "Fart 2", JellyfinImage.Empty)
+                            MediaSnippet.Show(
+                                id = "2",
+                                title = "Global Metldown: Melting Again & Again",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty,
+                                season = 1, eps = 2, epsTitle = "Prologue"
+                            ),
+                            MediaSnippet.Show(
+                                "3",
+                                title = "Satan's Alley",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty,
+                                season = 1,
+                                eps = 2,
+                                epsTitle = "Prologue"
+                            ),
+                            MediaSnippet.Show(
+                                id = "4",
+                                title = "Fart",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty,
+                                season = 1,
+                                eps = 2,
+                                epsTitle = "Prologue"
+                            ),
+                            MediaSnippet.Show(
+                                id = "5",
+                                title = "Fart 2",
+                                state = MediaState.Empty,
+                                img = JellyfinImage.Empty,
+                                season = 1,
+                                eps = 2,
+                                epsTitle = "Prologue"
+                            )
                         )
                     )
                 )

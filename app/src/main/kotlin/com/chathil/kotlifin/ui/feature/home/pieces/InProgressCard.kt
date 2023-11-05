@@ -15,25 +15,21 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import coil.compose.AsyncImage
 import com.chathil.kotlifin.data.model.image.JellyfinImage
+import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.data.model.media.MediaState
-import com.chathil.kotlifin.data.model.media.NowWatching
 import com.chathil.kotlifin.ui.feature.home.mvi.Intent
-import com.chathil.kotlifin.ui.shared.MEDIA_CARD_ASPECT_RATIO
-import com.chathil.kotlifin.ui.shared.MEDIA_CARD_POSTER_SIZE
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
 
 @Composable
 fun InProgressCard(
     modifier: Modifier = Modifier,
-    media: NowWatching,
+    media: MediaSnippet,
     dispatch: (Intent) -> Unit = {}
 ) {
     Column(modifier = modifier) {
@@ -61,7 +57,7 @@ fun InProgressCard(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.width(InProgressCardImageSize * ImageAspectRatio.first.dp)
         )
-        if (media is NowWatching.Show) {
+        if (media is MediaSnippet.Show) {
             val showSubtitle = "S${media.season}E${media.eps} - ${media.epsTitle}"
             Spacer(modifier = Modifier.height(height = KotlifinTheme.dimensions.spacingXXS))
             Text(
@@ -116,7 +112,7 @@ private fun InProgressCardPreview() {
     KotlifinTheme {
         Column(modifier = Modifier.padding(8.dp)) {
             InProgressCard(
-                media = NowWatching.Movie(
+                media = MediaSnippet.Movie(
                     id = "",
                     title = "Satan's Alley",
                     state = MediaState(isFavorite = false, isPlayed = false),
@@ -125,7 +121,7 @@ private fun InProgressCardPreview() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             InProgressCard(
-                media = NowWatching.Show(
+                media = MediaSnippet.Show(
                     id = "",
                     title = "New Yellow",
                     state = MediaState(isFavorite = false, isPlayed = false),
@@ -135,7 +131,6 @@ private fun InProgressCardPreview() {
                     img = JellyfinImage.Empty
                 )
             )
-
         }
     }
 }

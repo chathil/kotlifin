@@ -8,7 +8,6 @@ import com.chathil.kotlifin.data.dto.request.media.toJellyfinRequest
 import com.chathil.kotlifin.data.dto.request.movie.LatestMoviesRequest
 import com.chathil.kotlifin.data.dto.request.media.NowWatchingRequest
 import com.chathil.kotlifin.data.model.media.MediaSnippet
-import com.chathil.kotlifin.data.model.media.NowWatching
 import com.chathil.kotlifin.data.repository.base.BaseRepository
 import com.chathil.kotlifin.data.store.ActiveSessionDataStore
 import com.chathil.kotlifin.data.vo.Resource
@@ -30,7 +29,7 @@ class MediaRepositoryImpl @Inject constructor(
         private const val JUMP_THRESHOLD_MULTIPLIER = 3
     }
 
-    override fun fetchNowWatching(request: NowWatchingRequest): Pager<Int, NowWatching> {
+    override fun fetchNowWatching(request: NowWatchingRequest): Pager<Int, MediaSnippet> {
         return Pager(
             config = PagingConfig(
                 pageSize = request.limit,

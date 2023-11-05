@@ -1,6 +1,8 @@
 package com.chathil.kotlifin.data.dto.request.media
 
 import com.chathil.kotlifin.data.dto.request.paged.JellyfinPagedRequest
+import org.jellyfin.sdk.model.UUID
+import org.jellyfin.sdk.model.api.request.GetResumeItemsRequest
 
 data class NowWatchingRequest(
     override val startIndex: Int,
@@ -11,5 +13,9 @@ data class NowWatchingRequest(
 ) : JellyfinPagedRequest() {
     companion object {
         val Initial = NowWatchingRequest(startIndex = 0)
+    }
+
+    fun asGetResumeItemsRequest(userId: UUID): GetResumeItemsRequest {
+        return GetResumeItemsRequest(userId = userId, limit = limit)
     }
 }

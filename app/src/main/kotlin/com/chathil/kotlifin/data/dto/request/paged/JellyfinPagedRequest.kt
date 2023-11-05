@@ -10,14 +10,4 @@ abstract class JellyfinPagedRequest(
     open val sortBy: SortBy = SortBy.DESCENDING,
     open val prefetchDistance: Int = 1,
     open val limit: Int = 10,
-) {
-    fun asGetItemRequest(): GetItemsRequest {
-        return GetItemsRequest(
-            isMovie = true,
-            sortOrder = listOf(SortBy.toJellyfinSortOrder(sortBy)),
-            sortBy = listOf(orderBy.rawValue),
-            startIndex = startIndex,
-            limit = limit,
-        )
-    }
-}
+)

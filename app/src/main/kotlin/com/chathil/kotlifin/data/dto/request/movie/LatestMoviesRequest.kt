@@ -3,6 +3,8 @@ package com.chathil.kotlifin.data.dto.request.movie
 import com.chathil.kotlifin.data.dto.request.media.OrderBy
 import com.chathil.kotlifin.data.dto.request.media.SortBy
 import com.chathil.kotlifin.data.dto.request.paged.JellyfinPagedRequest
+import org.jellyfin.sdk.model.UUID
+import org.jellyfin.sdk.model.api.request.GetItemsRequest
 
 data class LatestMoviesRequest(
     override val startIndex: Int,
@@ -13,5 +15,15 @@ data class LatestMoviesRequest(
 ) : JellyfinPagedRequest() {
     companion object {
         val Initial = LatestMoviesRequest(startIndex = 0)
+    }
+
+    fun asGetItemsRequest(): GetItemsRequest {
+        return GetItemsRequest(
+            isMovie = true,
+            sortOrder = listOf(SortBy.toJellyfinSortOrder(sortBy)),
+            sortBy = listOf(orderBy.rawValue),
+            startIndex = startIndex,
+            limit = limit,
+        )
     }
 }

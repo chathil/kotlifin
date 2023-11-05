@@ -10,6 +10,7 @@ import org.jellyfin.sdk.api.client.Response
 import org.jellyfin.sdk.api.client.extensions.itemsApi
 import org.jellyfin.sdk.model.api.BaseItemDto
 import org.jellyfin.sdk.model.api.BaseItemDtoQueryResult
+import org.jellyfin.sdk.model.api.request.GetItemsRequest
 
 class MediaSnippetPagingSource(
     api: () -> Flow<ApiClient>,
@@ -20,7 +21,12 @@ class MediaSnippetPagingSource(
         return response.asMediaSnippet(baseUrl)
     }
 
-    override suspend fun invokeApiCall(api: ApiClient): Response<BaseItemDtoQueryResult> {
-        return api.itemsApi.getItems(request.asGetItemRequest())
+    override suspend fun invokeApiCall(
+        api: ApiClient,
+        params: LoadParams<Int>
+    ): Response<BaseItemDtoQueryResult> {
+        val currentIndex = params.key ?: 0
+        val itemsRequest = request.asGetItemsRequest().copy(startIndex = currentIndex)
+        return api.itemsApi.getItems(itemsRequest)
     }
 }

@@ -5,7 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.chathil.kotlifin.data.dto.request.media.LatestMediaRequest
 import com.chathil.kotlifin.data.dto.request.media.MediaType
 import com.chathil.kotlifin.data.dto.request.media.NowWatchingRequest
+import com.chathil.kotlifin.data.dto.request.show.ShowNextUpRequest
 import com.chathil.kotlifin.data.repository.media.MediaRepository
+import com.chathil.kotlifin.data.repository.show.ShowRepository
 import com.chathil.kotlifin.data.store.ActiveSessionDataStore
 import com.chathil.kotlifin.data.vo.Resource
 import com.chathil.kotlifin.ui.core.CoreMviViewModel
@@ -25,17 +27,25 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     activeSession: ActiveSessionDataStore,
     private val mediaRepository: MediaRepository,
+    private val showRepository: ShowRepository,
     savedStateHandle: SavedStateHandle,
 ) : CoreMviViewModel<Intent, Action, Result, State, Event>(State.Initial, savedStateHandle) {
 
     companion object {
-        private const val LOAD_LIMIT = 15
-        private const val PREFETCH_DISTANCE = 3
+        const val LOAD_LIMIT = 15
+        const val PREFETCH_DISTANCE = 3
     }
 
     init {
         dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.MOVIE)))
         dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.TV_SHOW)))
+        dispatch(
+            Intent.LoadShowNextUp(
+                ShowNextUpRequest.Initial.copy(
+                    limit = LOAD_LIMIT, prefetchDistance = PREFETCH_DISTANCE
+                )
+            )
+        )
         dispatch(
             Intent.LoadNowWatching(
                 NowWatchingRequest.Initial.copy(
@@ -63,12 +73,17 @@ class HomeViewModel @Inject constructor(
                 )
             )
         )
+
+        is Action.LoadShowNextUp -> flowOf(
+            Result.LoadShowNextUpResult(showRepository.fetchNextUp(action.request))
+        )
     }
 
     override fun intentToAction(intent: Intent): Action = when (intent) {
         is Intent.LoadLatestMedia -> Action.LoadLatestMedia(intent.request)
         is Intent.SaveActiveSession -> Action.SaveActiveSession(intent.session)
         is Intent.LoadNowWatching -> Action.LoadNowWatching(intent.request)
+        is Intent.LoadShowNextUp -> Action.LoadShowNextUp(intent.request)
     }
 
     override fun reducer(state: State, result: Result): State = when (result) {
@@ -94,6 +109,12 @@ class HomeViewModel @Inject constructor(
             isNowWatchingLoading = false,
             error = null,
             nowWatchingPager = result.data
+        )
+
+        is Result.LoadShowNextUpResult -> state.copy(
+            isShowNextUpLoading = false,
+            error = null,
+            showNextUpPager = result.data
         )
     }
 }
