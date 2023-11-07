@@ -6,21 +6,21 @@ import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.data.model.session.ActiveSession
 
 data class State(
-    val isMediaLoading: Map<MediaType, Boolean>,
+    val isLatestMediaLoading: Map<MediaType, Boolean>,
     val latestMedia: Map<MediaType, List<MediaSnippet>>,
     val isNowWatchingLoading: Boolean,
     val isShowNextUpLoading: Boolean,
     val nowWatchingPager: Pager<Int, MediaSnippet>?,
-    val showNextUpPager: Pager<Int, MediaSnippet.Show>?,
+    val showNextUpPager: Pager<Int, MediaSnippet.Episode>?,
     val latestMediaLoadError: Map<MediaType, Throwable>,
     val activeSession: ActiveSession,
     val error: Throwable?
 ) {
     companion object {
         val Initial = State(
-            isMediaLoading = mapOf(
+            isLatestMediaLoading = mapOf(
                 MediaType.MOVIE to false,
-                MediaType.TV_SHOW to false
+                MediaType.SHOW to false
             ),
             isNowWatchingLoading = false,
             isShowNextUpLoading = false,

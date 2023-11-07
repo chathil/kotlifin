@@ -57,7 +57,7 @@ fun InProgressCard(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.width(InProgressCardImageSize * ImageAspectRatio.first.dp)
         )
-        if (media is MediaSnippet.Show) {
+        if (media is MediaSnippet.Episode) {
             val showSubtitle = "S${media.season}E${media.eps} - ${media.epsTitle}"
             Spacer(modifier = Modifier.height(height = KotlifinTheme.dimensions.spacingXXS))
             Text(
@@ -121,7 +121,7 @@ private fun InProgressCardPreview() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             InProgressCard(
-                media = MediaSnippet.Show(
+                media = MediaSnippet.Episode(
                     id = "",
                     title = "New Yellow",
                     state = MediaState(isFavorite = false, isPlayed = false),

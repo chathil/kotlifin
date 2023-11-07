@@ -58,7 +58,7 @@ fun LatestSection(
         Spacer(modifier = Modifier.height(KotlifinTheme.dimensions.spacingSmall))
 
         AnimatedContent(
-            targetState = state.isMediaLoading[MediaType.MOVIE] == false,
+            targetState = state.isLatestMediaLoading[MediaType.MOVIE] == false,
             label = "latest media loading"
         ) { isNotLoading ->
             if (isNotLoading) {
@@ -105,11 +105,11 @@ fun LatestSection(
         Spacer(modifier = Modifier.height(KotlifinTheme.dimensions.spacingSmall))
 
         AnimatedContent(
-            targetState = state.isMediaLoading[MediaType.TV_SHOW] == false,
+            targetState = state.isLatestMediaLoading[MediaType.SHOW] == false,
             label = "latest media loading"
         ) { isNotLoading ->
             if (isNotLoading) {
-                val mediaErr = state.latestMediaLoadError[MediaType.TV_SHOW]
+                val mediaErr = state.latestMediaLoadError[MediaType.SHOW]
                 if (mediaErr == null) {
                     Row(
                         modifier = Modifier
@@ -117,14 +117,14 @@ fun LatestSection(
                             .horizontalScroll(rememberScrollState())
                     ) {
                         Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
-                        state.latestMedia[MediaType.TV_SHOW]?.forEach { item ->
+                        state.latestMedia[MediaType.SHOW]?.forEach { item ->
                             MediaCard(data = item)
                             Spacer(modifier = Modifier.width(KotlifinTheme.dimensions.spacingMedium))
                         }
                     }
                 } else {
                     HomeRetrySection(error = mediaErr) {
-                        dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.TV_SHOW)))
+                        dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.SHOW)))
                     }
                 }
             } else {
@@ -146,9 +146,9 @@ private fun HomeSectionPreview() {
         Box {
             LatestSection(
                 state = State.Initial.copy(
-                    isMediaLoading = mapOf(
+                    isLatestMediaLoading = mapOf(
                         MediaType.MOVIE to true,
-                        MediaType.TV_SHOW to false
+                        MediaType.SHOW to false
                     ),
                     latestMedia = mapOf(
                         MediaType.MOVIE to listOf(
@@ -183,49 +183,36 @@ private fun HomeSectionPreview() {
                                 img = JellyfinImage.Empty
                             )
                         ),
-                        MediaType.TV_SHOW to listOf(
+                        MediaType.SHOW to listOf(
                             MediaSnippet.Show(
                                 id = "1",
                                 title = "Simple Jack",
-                                state = MediaState.Empty,
                                 img = JellyfinImage.Empty,
-                                season = 1,
-                                eps = 2,
-                                epsTitle = "Prologue"
+                                series = emptyList()
                             ),
                             MediaSnippet.Show(
                                 id = "2",
                                 title = "Global Metldown: Melting Again & Again",
-                                state = MediaState.Empty,
                                 img = JellyfinImage.Empty,
-                                season = 1, eps = 2, epsTitle = "Prologue"
+                                series = emptyList()
                             ),
                             MediaSnippet.Show(
                                 "3",
                                 title = "Satan's Alley",
-                                state = MediaState.Empty,
                                 img = JellyfinImage.Empty,
-                                season = 1,
-                                eps = 2,
-                                epsTitle = "Prologue"
+                                series = emptyList()
                             ),
                             MediaSnippet.Show(
                                 id = "4",
                                 title = "Fart",
-                                state = MediaState.Empty,
                                 img = JellyfinImage.Empty,
-                                season = 1,
-                                eps = 2,
-                                epsTitle = "Prologue"
+                                series = emptyList()
                             ),
                             MediaSnippet.Show(
                                 id = "5",
                                 title = "Fart 2",
-                                state = MediaState.Empty,
                                 img = JellyfinImage.Empty,
-                                season = 1,
-                                eps = 2,
-                                epsTitle = "Prologue"
+                                series = emptyList()
                             )
                         )
                     )

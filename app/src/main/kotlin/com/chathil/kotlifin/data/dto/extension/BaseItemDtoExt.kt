@@ -14,7 +14,9 @@ fun BaseItemDto.asMediaSnippet(
     return when (type) {
         BaseItemKind.MOVIE -> asMovieMediaSnippet(baseUrl, imageType)
 
-        BaseItemKind.EPISODE, BaseItemKind.SERIES -> asShowMediaSnippet(baseUrl, imageType)
+        BaseItemKind.EPISODE-> asEpisodeMediaSnippet(baseUrl, imageType)
+
+        BaseItemKind.SERIES -> asShowMediaSnippet(baseUrl, imageType)
 
         else -> {
             MediaSnippet.Unknown(
@@ -56,8 +58,8 @@ private fun BaseItemDto.asPosterImg(baseUrl: String): JellyfinImage {
     )
 }
 
-fun BaseItemDto.asShowMediaSnippet(baseUrl: String, imageType: ImageType): MediaSnippet.Show {
-    return MediaSnippet.Show(
+fun BaseItemDto.asEpisodeMediaSnippet(baseUrl: String, imageType: ImageType): MediaSnippet.Episode {
+    return MediaSnippet.Episode(
         id = id.toString(),
         title = seriesName ?: name ?: "",
         state = MediaState(
@@ -72,7 +74,19 @@ fun BaseItemDto.asShowMediaSnippet(baseUrl: String, imageType: ImageType): Media
         season = parentIndexNumber ?: 0,
         eps = indexNumber ?: 0,
         epsTitle = name ?: ""
+    )
+}
 
+fun BaseItemDto.asShowMediaSnippet(baseUrl: String, imageType: ImageType): MediaSnippet.Show {
+    return MediaSnippet.Show(
+        id = id.toString(),
+        title = name ?: "",
+        series = emptyList(),
+        img = when (imageType) {
+            ImageType.PRIMARY -> asPosterImg(baseUrl)
+            ImageType.BACKDROP -> asBackDropImg(baseUrl)
+            else -> asPosterImg(baseUrl)
+        }
     )
 }
 

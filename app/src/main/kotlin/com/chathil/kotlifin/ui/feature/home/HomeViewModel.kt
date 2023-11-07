@@ -38,7 +38,7 @@ class HomeViewModel @Inject constructor(
 
     init {
         dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.MOVIE)))
-        dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.TV_SHOW)))
+        dispatch(Intent.LoadLatestMedia(LatestMediaRequest(MediaType.SHOW)))
         dispatch(
             Intent.LoadShowNextUp(
                 ShowNextUpRequest.Initial.copy(
@@ -89,17 +89,17 @@ class HomeViewModel @Inject constructor(
     override fun reducer(state: State, result: Result): State = when (result) {
         is Result.LoadLatestMediaResult -> when (result.data) {
             is Resource.Loading -> state.copy(
-                isMediaLoading = state.isMediaLoading + mapOf(result.mediaType to true),
+                isLatestMediaLoading = state.isLatestMediaLoading + mapOf(result.mediaType to true),
                 latestMediaLoadError = state.latestMediaLoadError.filterKeys { key -> key != result.mediaType }
             )
 
             is Resource.Success -> state.copy(
                 latestMedia = state.latestMedia + mapOf(result.mediaType to result.data.data),
-                isMediaLoading = state.isMediaLoading + mapOf(result.mediaType to false)
+                isLatestMediaLoading = state.isLatestMediaLoading + mapOf(result.mediaType to false)
             )
 
             is Resource.Error -> state.copy(
-                isMediaLoading = state.isMediaLoading + mapOf(result.mediaType to false),
+                isLatestMediaLoading = state.isLatestMediaLoading + mapOf(result.mediaType to false),
                 latestMediaLoadError = state.latestMediaLoadError + mapOf(result.mediaType to result.data.error)
             )
         }

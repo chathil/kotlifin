@@ -17,7 +17,7 @@ class ShowRepositoryImpl @Inject constructor(
     companion object {
         private const val JUMP_THRESHOLD_MULTIPLIER = 3
     }
-    override fun fetchNextUp(request: ShowNextUpRequest): Pager<Int, MediaSnippet.Show> {
+    override fun fetchNextUp(request: ShowNextUpRequest): Pager<Int, MediaSnippet.Episode> {
         return Pager(
             config = PagingConfig(
                 pageSize = request.limit,

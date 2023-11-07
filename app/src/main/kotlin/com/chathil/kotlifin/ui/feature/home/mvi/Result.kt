@@ -17,5 +17,5 @@ sealed interface Result {
     ) : Result
 
     data class LoadNowWatchingResult(val data: Pager<Int, MediaSnippet>) : Result
-    data class LoadShowNextUpResult(val data: Pager<Int, MediaSnippet.Show>) : Result
+    data class LoadShowNextUpResult(val data: Pager<Int, MediaSnippet.Episode>) : Result
 }
