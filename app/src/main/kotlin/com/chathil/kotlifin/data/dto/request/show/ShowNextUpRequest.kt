@@ -23,7 +23,7 @@ data class ShowNextUpRequest(
         return GetNextUpRequest(
             userId = userId,
             startIndex = startIndex,
-            limit = limit,
+            limit = limit
         )
     }
 }

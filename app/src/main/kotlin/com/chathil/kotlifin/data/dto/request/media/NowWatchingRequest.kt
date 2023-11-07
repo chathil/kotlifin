@@ -16,6 +16,10 @@ data class NowWatchingRequest(
     }
 
     fun asGetResumeItemsRequest(userId: UUID): GetResumeItemsRequest {
-        return GetResumeItemsRequest(userId = userId, limit = limit)
+        return GetResumeItemsRequest(
+            userId = userId,
+            limit = limit,
+            includeItemTypes = supportedMediaTypes.map(MediaType::toJellyfinMediaType)
+        )
     }
 }
