@@ -4,19 +4,22 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -26,6 +29,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -39,14 +43,16 @@ import com.chathil.kotlifin.data.dto.request.show.ShowNextUpRequest
 import com.chathil.kotlifin.data.model.image.JellyfinImage
 import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.data.model.media.MediaState
+import com.chathil.kotlifin.data.model.session.ActiveSession
 import com.chathil.kotlifin.ui.feature.home.mvi.Intent
 import com.chathil.kotlifin.ui.feature.home.mvi.State
+import com.chathil.kotlifin.ui.feature.home.pieces.LibraryCard
 import com.chathil.kotlifin.ui.feature.home.pieces.HomeRetrySection
-import com.chathil.kotlifin.ui.feature.home.pieces.LatestSection
 import com.chathil.kotlifin.ui.feature.home.pieces.InProgressCard
 import com.chathil.kotlifin.ui.feature.home.pieces.InProgressCardLoading
-import com.chathil.kotlifin.ui.shared.MediaCard
+import com.chathil.kotlifin.ui.feature.home.pieces.LatestSection
 import com.chathil.kotlifin.ui.theme.KotlifinTheme
+import com.chathil.kotlifin.utils.asPagerData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -54,25 +60,57 @@ fun HomeScreen(
     state: State = State.Initial,
     dispatch: (Intent) -> Unit = {},
     goToDetail: () -> Unit = {},
-    goToSettings: () -> Unit = {}
+    goToSettings: () -> Unit = {},
+    goToListScreen: (mediaType: MediaType?) -> Unit = {}
 ) {
     Scaffold(
         topBar = {
             HomeTopAppBar(
                 onSettingTapped = goToSettings,
-                serverName = state.activeSession.serverName
+                serverName = state.activeSession.serverName,
+                onSearchTapped = { goToListScreen(MediaType.MOVIE) }
             )
-        }
+        },
+        contentWindowInsets = WindowInsets(0.dp)
     ) { padding ->
         Column(
             modifier = Modifier
                 .verticalScroll(rememberScrollState())
                 .padding(padding)
         ) {
+            LibrarySection(
+                modifier = Modifier.padding(KotlifinTheme.dimensions.spacingMedium),
+                dispatch = dispatch
+            )
             NowWatchingSection(state = state, dispatch = dispatch)
             ShowNextUpSection(state = state, dispatch = dispatch)
             LatestSection(state = state, dispatch = dispatch)
         }
+    }
+}
+
+@Composable
+private fun LibrarySection(
+    modifier: Modifier = Modifier,
+    dispatch: (Intent) -> Unit = {}
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .wrapContentHeight(),
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        LibraryCard(
+            modifier = Modifier
+                .weight(1f)
+                .height(76.dp), "Movies"
+        )
+        LibraryCard(
+            modifier = Modifier
+                .weight(1f)
+                .height(76.dp), "TV Shows"
+        )
     }
 }
 
@@ -191,9 +229,15 @@ private const val NOW_WATCHING_PLACEHOLDER_COUNT = 4
 @Composable
 private fun HomeTopAppBar(
     onSettingTapped: () -> Unit = {},
+    onSearchTapped: () -> Unit = {},
     serverName: String = ""
 ) {
-    LargeTopAppBar(
+    CenterAlignedTopAppBar(
+        navigationIcon = {
+            IconButton(onClick = onSearchTapped) {
+                Icon(imageVector = Icons.Rounded.Search, contentDescription = "search")
+            }
+        },
         title = {
             Text(text = serverName)
         },
@@ -209,10 +253,10 @@ const val HomeRoute = "home"
 
 fun NavGraphBuilder.homeScreen(
     goToDetail: () -> Unit = {},
-    goToSettings: () -> Unit = {}
+    goToSettings: () -> Unit = {},
+    goToListScreen: (mediaType: MediaType?) -> Unit = {}
 ) {
     composable(HomeRoute) {
-
         val viewModel: HomeViewModel = hiltViewModel()
         val state by viewModel.viewStates.collectAsStateWithLifecycle()
 
@@ -220,7 +264,8 @@ fun NavGraphBuilder.homeScreen(
             state = state,
             dispatch = viewModel::dispatch,
             goToDetail = goToDetail,
-            goToSettings = goToSettings
+            goToSettings = goToSettings, 
+            goToListScreen = goToListScreen
         )
     }
 }
@@ -238,6 +283,34 @@ fun NavController.navigateToHomeScreen() {
 fun HomeScreenPreview() {
     KotlifinTheme {
         val state = State.Initial.copy(
+            activeSession = ActiveSession.Empty.copy(serverName = "Home Demo"),
+            showNextUpPager = listOf(
+                MediaSnippet.Episode(
+                    id = "",
+                    title = "New Yellow",
+                    state = MediaState(isFavorite = false, isPlayed = false),
+                    season = 1,
+                    eps = 1,
+                    epsTitle = "Yellow Episode",
+                    img = JellyfinImage.Empty
+                ), MediaSnippet.Episode(
+                    id = "",
+                    title = "New Yellow",
+                    state = MediaState(isFavorite = false, isPlayed = false),
+                    season = 1,
+                    eps = 1,
+                    epsTitle = "Yellow Episode",
+                    img = JellyfinImage.Empty
+                ), MediaSnippet.Episode(
+                    id = "",
+                    title = "New Yellow",
+                    state = MediaState(isFavorite = false, isPlayed = false),
+                    season = 1,
+                    eps = 1,
+                    epsTitle = "Yellow Episode",
+                    img = JellyfinImage.Empty
+                )
+            ).asPagerData(),
             latestMedia = mapOf(
                 MediaType.MOVIE to listOf(
                     MediaSnippet.Movie("1", "Simple Jack", MediaState.Empty, JellyfinImage.Empty),

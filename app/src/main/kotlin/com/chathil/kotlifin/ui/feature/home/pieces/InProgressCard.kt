@@ -71,7 +71,7 @@ fun InProgressCard(
     }
 }
 
-private const val InProgressCardImageSize = 10
+private const val InProgressCardImageSize = 16
 private val ImageAspectRatio = Pair(16, 9)
 
 @Composable

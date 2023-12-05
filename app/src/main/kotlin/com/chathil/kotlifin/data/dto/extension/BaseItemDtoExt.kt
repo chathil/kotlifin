@@ -27,9 +27,9 @@ fun BaseItemDto.asMediaSnippet(
                     isPlayed = userData?.played ?: false
                 ),
                 img = when (imageType) {
-                    ImageType.PRIMARY -> asPosterImg(baseUrl)
+                    ImageType.PRIMARY -> asPrimaryImage(baseUrl)
                     ImageType.BACKDROP -> asBackDropImg(baseUrl)
-                    else -> asPosterImg(baseUrl)
+                    else -> asPrimaryImage(baseUrl)
                 }
             )
         }
@@ -49,7 +49,7 @@ private fun BaseItemDto.asBackDropImg(baseUrl: String): JellyfinImage {
     )
 }
 
-private fun BaseItemDto.asPosterImg(baseUrl: String): JellyfinImage {
+private fun BaseItemDto.asPrimaryImage(baseUrl: String): JellyfinImage {
     return JellyfinImage(
         baseUrl = baseUrl,
         itemId = id.toString(),
@@ -67,9 +67,9 @@ fun BaseItemDto.asEpisodeMediaSnippet(baseUrl: String, imageType: ImageType): Me
             isPlayed = userData?.played ?: false
         ),
         img = when (imageType) {
-            ImageType.PRIMARY -> asPosterImg(baseUrl)
+            ImageType.PRIMARY -> asPrimaryImage(baseUrl)
             ImageType.BACKDROP -> asBackDropImg(baseUrl)
-            else -> asPosterImg(baseUrl)
+            else -> asPrimaryImage(baseUrl)
         },
         season = parentIndexNumber ?: 0,
         eps = indexNumber ?: 0,
@@ -83,9 +83,9 @@ fun BaseItemDto.asShowMediaSnippet(baseUrl: String, imageType: ImageType): Media
         title = name ?: "",
         series = emptyList(),
         img = when (imageType) {
-            ImageType.PRIMARY -> asPosterImg(baseUrl)
+            ImageType.PRIMARY -> asPrimaryImage(baseUrl)
             ImageType.BACKDROP -> asBackDropImg(baseUrl)
-            else -> asPosterImg(baseUrl)
+            else -> asPrimaryImage(baseUrl)
         }
     )
 }
@@ -99,9 +99,9 @@ fun BaseItemDto.asMovieMediaSnippet(baseUrl: String, imageType: ImageType): Medi
             isPlayed = userData?.played ?: false
         ),
         img = when (imageType) {
-            ImageType.PRIMARY -> asPosterImg(baseUrl)
+            ImageType.PRIMARY -> asPrimaryImage(baseUrl)
             ImageType.BACKDROP -> asBackDropImg(baseUrl)
-            else -> asPosterImg(baseUrl)
+            else -> asPrimaryImage(baseUrl)
         }
     )
 }

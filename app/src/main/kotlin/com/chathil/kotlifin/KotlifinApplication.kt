@@ -30,7 +30,6 @@ class KotlifinApplication: Application(), ImageLoaderFactory {
                 } else {
                     this
                 }
-                this
             }
             .allowRgb565(true)
             .build()

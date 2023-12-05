@@ -5,7 +5,7 @@ import androidx.paging.PagingConfig
 import com.chathil.kotlifin.data.dto.extension.asMediaSnippet
 import com.chathil.kotlifin.data.dto.request.media.LatestMediaRequest
 import com.chathil.kotlifin.data.dto.request.media.toJellyfinRequest
-import com.chathil.kotlifin.data.dto.request.movie.LatestMoviesRequest
+import com.chathil.kotlifin.data.dto.request.movie.MediaRequest
 import com.chathil.kotlifin.data.dto.request.media.NowWatchingRequest
 import com.chathil.kotlifin.data.model.media.MediaSnippet
 import com.chathil.kotlifin.data.repository.base.BaseRepository
@@ -43,7 +43,7 @@ class MediaRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override fun fetchLatestMovies(request: LatestMoviesRequest): Pager<Int, MediaSnippet> {
+    override fun fetchMedia(request: MediaRequest): Pager<Int, MediaSnippet> {
         return Pager(
             config = PagingConfig(
                 pageSize = request.limit,

@@ -51,7 +51,7 @@ fun MediaCard(modifier: Modifier = Modifier, data: MediaSnippet) {
     }
 }
 
-const val MEDIA_CARD_POSTER_SIZE = 46
+const val MEDIA_CARD_POSTER_SIZE = 64
 val MEDIA_CARD_ASPECT_RATIO = Pair(2, 3)
 
 private val posterSize = DpSize(
